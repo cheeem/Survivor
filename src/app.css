@@ -1,0 +1,45 @@
+/* import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Montserrat:wght@300;400;500;600;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap');
+
+* {
+
+  /* box sizing */
+  box-sizing: border-box;
+
+  /* margin and padding reset */
+  margin: 0;
+  padding: 0;
+
+  /* universal font styles */
+  font-family: 'Montserrat', sans-serif;
+  color: black;
+  text-decoration: none;
+  list-style: none;
+  
+}
+
+:root {
+
+  /* neutral palette */
+  --white: white;
+  --lightestgrey: hsla(0, 0%, 95%, 1);
+  --lightgrey: hsla(0, 0%, 90%, 1);
+  --mediumgrey: hsla(0, 0%, 80%, 1);
+  --mediumdarkgrey: hsla(0, 0%, 45%, 1);
+  --darkgrey: hsla(0,0%,9%, 1);
+
+  /* highlight palette */
+  --highlight: red;
+
+}
+
+html, body, #app {
+  height: 100%;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+
+  padding: 0 10vw;
+}
