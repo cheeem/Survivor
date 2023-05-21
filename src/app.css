@@ -18,28 +18,13 @@
   
 }
 
-:root {
-
-  /* neutral palette */
-  --white: white;
-  --lightestgrey: hsla(0, 0%, 95%, 1);
-  --lightgrey: hsla(0, 0%, 90%, 1);
-  --mediumgrey: hsla(0, 0%, 80%, 1);
-  --mediumdarkgrey: hsla(0, 0%, 45%, 1);
-  --darkgrey: hsla(0,0%,9%, 1);
-
-  /* highlight palette */
-  --highlight: red;
-
-}
-
 html, body, #app {
   height: 100%;
 }
 
 #app {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
 
   padding: 0 10vw;
 }

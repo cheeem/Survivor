@@ -23,22 +23,44 @@
     import Elimination from "./pages/Elimination.svelte";
     import Revival from "./pages/Revival.svelte";
 
-    const PAGES = {
-        [GAME_STATE.MENU]: Menu,
-        [GAME_STATE.IN_GAME]: Game,
-        [GAME_STATE.ELIMINATION]: Elimination,
-        [GAME_STATE.REVIVAL]: Revival,
-    }
+    // const PAGES = {
+    //     [GAME_STATE.MENU]: Menu,
+    //     [GAME_STATE.IN_GAME]: Game,
+    //     [GAME_STATE.ELIMINATION]: Elimination,
+    //     [GAME_STATE.REVIVAL]: Revival,
+    // }
 
     let state: State = GAME_STATE.MENU;
     let teams: Team[] = get("teams", teams_init);
     let challenge: Challenge = {
         //bind values to form inputs
-        index: get("challenge_index", 4),
+        index: get("challenge_index", 3),
         title: '',
         description: '',
         timer: null,
     };
+
+    function new_challenge(title: string, description: string, has_timer: boolean, min: string, sec: string) {
+
+        challenge.index++;
+        challenge.title = title;
+        challenge.description = description;
+        challenge.timer = has_timer ? (parseFloat(min) || 0) * 60 + (parseFloat(sec) || 0) : null;
+
+        challenge = challenge;
+
+        state = GAME_STATE.IN_GAME;
+
+    }
+
+    function end_challenge() {
+        state = GAME_STATE.MENU;
+    }
+
+    function add_points (team_index: number, points: number) {
+        teams[team_index].points += points; 
+        teams = teams;
+    }
 
     function eliminate(team_index: number, participant_index: number): void {
         teams[team_index].participants[participant_index].eliminated = true;
@@ -54,27 +76,6 @@
 
 </script>
 
-<header> 
-    {#each teams as { title, participants, }, team_index}
-
-        <div class="team"> 
-            <h2> {title} </h2>
-            <ul class="participants">
-            {#each sort_participants(participants) as { name, eliminated, }, participant_index}
-            <li class={eliminated ? "eliminated" : ""}
-                on:click={() => (eliminated ? revive : eliminate)(team_index, participant_index)} 
-                on:keydown={() => (eliminated ? revive : eliminate)(team_index, participant_index)} 
-            >
-                <img src={svg_user} alt=""/>
-                <p> {name} </p>
-            </li>
-            {/each}
-            </ul>
-        </div>
-
-    {/each}
-</header>
-
 <main>
 
     <div class="heading"> 
@@ -82,15 +83,72 @@
         <h1> SURVIVOR </h1>
     </div>
 
-    <svelte:component this={PAGES[state]} />
+    {#if state === GAME_STATE.MENU}
+        <Menu {new_challenge} />
+    {:else if state === GAME_STATE.IN_GAME}
+        <Game {challenge} {teams} {add_points} {end_challenge} />
+    {:else if state === GAME_STATE.ELIMINATION}
+        <Elimination />
+    {:else if state === GAME_STATE.REVIVAL}
+        <Revival />
+    {/if}
 
 </main>
 
+<aside> 
+
+    {#each teams as { title, participants, }, team_index}
+        <div class="team"> 
+            <h2> {title} </h2>
+            <ul class="participants">
+                {#each sort_participants(participants) as { name, eliminated, }, participant_index}
+                    <li class="
+                        {eliminated ? "eliminated" : ""}
+                        {state === GAME_STATE.MENU ? "active" : ""}
+                    "
+                        on:click={() => state === GAME_STATE.MENU && (eliminated ? revive : eliminate)(team_index, participant_index)} 
+                        on:keydown={() => state === GAME_STATE.MENU && (eliminated ? revive : eliminate)(team_index, participant_index)} 
+                    >
+                        <img src={svg_user} alt=""/>
+                        <p> {name} </p>
+                    </li>
+                {/each}
+            </ul>
+        </div>
+    {/each}
+    
+    </aside>
+
 <style>
 
-    header {
+    main {
+        padding: 1.25em 2.25em;
+
+        width: 40vw;
+
+        background-color: black;
+    }
+
+    main * {
+        color: white;
+    }
+
+    h4 {
+        letter-spacing: 0.25em;
+        font-weight: 200;
+
+        translate: 0.3em 0.5em;
+    }
+
+    h1 {
+        font-size: 4em;
+    }
+
+    aside {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 10vw;
 
         padding: 2em 2em;
     }
@@ -100,18 +158,25 @@
         align-items: center;
         gap: 0.25em;
 
-        cursor: pointer;
+        font-size: calc(1em + 0.5vw);
+
+        cursor: not-allowed;
 
         transition: background-color 0.2s ease;
     }
 
-    li:hover {
+    .active {
+        cursor: pointer;
+    }
+
+    .active:hover {
         background-color: var(--lightestgrey);
     }
 
     p {
         position: relative;
 
+        white-space: nowrap;
         font-weight: 500;
     }
 
@@ -145,29 +210,6 @@
 
     .eliminated p::after {
         width: 100%;
-    }
-
-    main {
-        flex-grow: 1;
-
-        padding: 1.25em 2.25em;
-
-        background-color: black;
-    }
-
-    main * {
-        color: white;
-    }
-
-    h4 {
-        letter-spacing: 0.25em;
-        font-weight: 200;
-
-        translate: 0.3em 0.5em;
-    }
-
-    h1 {
-        font-size: 4em;
     }
 
 </style>
