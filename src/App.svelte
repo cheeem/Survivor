@@ -2,6 +2,7 @@
 
     //svgs
     import svg_user from "./assets/User.svg";
+
     //types
     import type { 
         State, 
@@ -9,6 +10,7 @@
         Participant, 
         Challenge,
     } from "./types";
+
     //utils
     import { 
         GAME_STATE,
@@ -17,23 +19,16 @@
         get,
         set,
     } from "./utils";
+
     //components
     import Menu from "./pages/Menu.svelte";
     import Game from "./pages/Game.svelte";
     import Elimination from "./pages/Elimination.svelte";
     import Revival from "./pages/Revival.svelte";
 
-    // const PAGES = {
-    //     [GAME_STATE.MENU]: Menu,
-    //     [GAME_STATE.IN_GAME]: Game,
-    //     [GAME_STATE.ELIMINATION]: Elimination,
-    //     [GAME_STATE.REVIVAL]: Revival,
-    // }
-
     let state: State = GAME_STATE.MENU;
     let teams: Team[] = get("teams", teams_init);
     let challenge: Challenge = {
-        //bind values to form inputs
         index: get("challenge_index", 3),
         title: '',
         description: '',
@@ -41,6 +36,8 @@
     };
 
     function new_challenge(title: string, description: string, has_timer: boolean, min: string, sec: string) {
+
+        teams.forEach((team: Team) => team.points = 0);
 
         challenge.index++;
         challenge.title = title;

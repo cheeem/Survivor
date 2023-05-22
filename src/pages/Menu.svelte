@@ -136,6 +136,16 @@
     }
 
     button {
+        opacity: 0.5;
+
+        cursor: not-allowed;
+
+        transition: opacity 0.2s ease;
+    }
+
+    form:valid button {
+        opacity: 1;
+
         cursor: pointer;
     }
 

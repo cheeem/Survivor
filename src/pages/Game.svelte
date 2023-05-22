@@ -11,11 +11,20 @@
     $: min = Math.floor(time / 60).toString().padStart(2, '0');
     $: sec = (time % 60).toString().padStart(2, '0');
 
+    let lowest_points: number = Number.POSITIVE_INFINITY;
+
     if(time) {
 
         let interval = setInterval(() => {
 
             if(time <= 0) {
+
+                for(let i = 0; i < teams.length; i++) {
+                    if(teams[i].points < lowest_points) {
+                        lowest_points = teams[i].points;
+                    }
+                }
+
                 return clearInterval(interval);
             }
 
@@ -28,14 +37,14 @@
 </script>
 
 <div class="game">
-    <h2> Challenge {challenge.index} {challenge.title ? `: ${challenge.title}` : ''} </h2>
+    <h2> Challenge {challenge.index}{challenge.title ? `: ${challenge.title}` : ''} </h2>
     <p> {challenge.description || ""} </p>
     {#if time !== null}
         <div class="timer"> {min}:{sec} </div>
     {/if}
     <ul>
         {#each teams as { title, points }, i}
-            <li>
+            <li class={points === lowest_points && "lost"}>
                 <div class="display">
                     <div class="title"> {title} </div>
                     <div class="points"> {points} </div>
@@ -102,9 +111,9 @@
         border-radius: 0.5em;
     }
 
-    /* .lost {
+    .lost {
         --team-color: red;
-    } */
+    }
 
     .display {
         padding: 0.5em;
