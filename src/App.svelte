@@ -54,9 +54,15 @@
         state = GAME_STATE.MENU;
     }
 
-    function add_points (team_index: number, points: number) {
+    function add_points(team_index: number, points: number) {
         teams[team_index].points += points; 
         teams = teams;
+    }
+
+    function change_team_title(team_index: number, title: string) {
+        teams[team_index].title = title;
+        teams = teams;
+        set("teams", teams);
     }
 
     function eliminate(team_index: number, participant_index: number): void {
@@ -96,12 +102,15 @@
 
     {#each teams as { title, participants, }, team_index}
         <div class="team"> 
-            <h2> {title} </h2>
+            <h2 contentEditable={state === GAME_STATE.MENU}
+                on:keydown={e => e.key === "Enter" && e.currentTarget.blur()}
+                on:blur={e => change_team_title(team_index, e.currentTarget.textContent)}
+            > {title} </h2>
             <ul class="participants">
                 {#each sort_participants(participants) as { name, eliminated, }, participant_index}
                     <li class="
-                        {eliminated ? "eliminated" : ""}
-                        {state === GAME_STATE.MENU ? "active" : ""}
+                        {eliminated && "eliminated"}
+                        {state === GAME_STATE.MENU && "active"}
                     "
                         on:click={() => state === GAME_STATE.MENU && (eliminated ? revive : eliminate)(team_index, participant_index)} 
                         on:keydown={() => state === GAME_STATE.MENU && (eliminated ? revive : eliminate)(team_index, participant_index)} 
