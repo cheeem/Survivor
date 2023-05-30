@@ -12,12 +12,15 @@
     $: sec = (time % 60).toString().padStart(2, '0');
 
     let lowest_points: number = Number.POSITIVE_INFINITY;
+    let finished: boolean = false;
 
     if(time) {
 
-        let interval = setInterval(() => {
+        const interval = setInterval(() => {
 
-            if(time <= 0) {
+            if(time === 0) {
+
+                finished = true;
 
                 for(let i = 0; i < teams.length; i++) {
                     if(teams[i].points < lowest_points) {
@@ -25,6 +28,9 @@
                     }
                 }
 
+            }
+
+            if(time <= 0) {
                 return clearInterval(interval);
             }
 
@@ -49,9 +55,9 @@
                     <div class="title"> {title} </div>
                     <div class="points"> {points} </div>
                 </div>
-                <div class="controls">
-                    <button on:click={() => add_points(i, 1)}> + </button>
-                    <button on:click={() => add_points(i, -1)}> - </button>
+                <div class="controls {finished && "finished"}">
+                    <button on:click={() => !finished && add_points(i, 1)}> + </button>
+                    <button on:click={() => !finished && add_points(i, -1)}> - </button>
                 </div>
             </li>
         {/each}
@@ -161,6 +167,10 @@
         border-radius: 1em;
 
         cursor: pointer;
+    }
+
+    .finished button {
+        cursor: not-allowed;
     }
 
 </style>

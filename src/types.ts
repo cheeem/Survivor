@@ -21,3 +21,8 @@ export type Challenge = {
     description: string,
     timer: number | null,
 }
+
+export type Dragged = {
+    team_index: number | null 
+    participant_index: number | null
+}

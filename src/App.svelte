@@ -9,6 +9,7 @@
         Team, 
         Participant, 
         Challenge,
+        Dragged,
     } from "./types";
 
     //utils
@@ -28,6 +29,10 @@
 
     let state: State = GAME_STATE.MENU;
     let teams: Team[] = get("teams", teams_init);
+    let dragged: Dragged = {
+        participant_index: null,
+        team_index: null,
+    };
     let challenge: Challenge = {
         index: get("challenge_index", 3),
         title: '',
@@ -35,7 +40,7 @@
         timer: null,
     };
 
-    function new_challenge(title: string, description: string, has_timer: boolean, min: string, sec: string) {
+    function new_challenge(title: string, description: string, has_timer: boolean, min: string, sec: string): void {
 
         teams.forEach((team: Team) => team.points = 0);
 
@@ -50,16 +55,28 @@
 
     }
 
-    function end_challenge() {
+    function end_challenge(): void {
         state = GAME_STATE.MENU;
     }
 
-    function add_points(team_index: number, points: number) {
+    function set_dragged(team_index: number, participant_index: number): void {
+        dragged.team_index = team_index;
+        dragged.participant_index = participant_index;
+    }
+
+    function add_points(team_index: number, points: number): void {
         teams[team_index].points += points; 
         teams = teams;
     }
 
-    function change_team_title(team_index: number, title: string) {
+    function change_team(new_team_index: number, { team_index, participant_index }: Dragged): void {
+        const participant: Participant = teams[team_index].participants.splice(participant_index, 1)[0];
+        teams[new_team_index].participants.push(participant);
+        teams = teams;
+        set("teams", teams);
+    }
+
+    function change_team_title(team_index: number, title: string): void {
         teams[team_index].title = title;
         teams = teams;
         set("teams", teams);
@@ -101,17 +118,22 @@
 <aside> 
 
     {#each teams as { title, participants, }, team_index}
-        <div class="team"> 
+        <div class="team"
+            on:dragover|preventDefault
+            on:drop|preventDefault={() => change_team(team_index, dragged)}
+        > 
             <h2 contentEditable={state === GAME_STATE.MENU}
                 on:keydown={e => e.key === "Enter" && e.currentTarget.blur()}
                 on:blur={e => change_team_title(team_index, e.currentTarget.textContent)}
             > {title} </h2>
             <ul class="participants">
                 {#each sort_participants(participants) as { name, eliminated, }, participant_index}
-                    <li class="
+                    <li draggable={state === GAME_STATE.MENU} class="
                         {eliminated && "eliminated"}
                         {state === GAME_STATE.MENU && "active"}
                     "
+                        on:dragstart={() => set_dragged(team_index, participant_index)}
+                        on:dragend={() => set_dragged(null, null)}
                         on:click={() => state === GAME_STATE.MENU && (eliminated ? revive : eliminate)(team_index, participant_index)} 
                         on:keydown={() => state === GAME_STATE.MENU && (eliminated ? revive : eliminate)(team_index, participant_index)} 
                     >
